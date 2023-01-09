@@ -24,10 +24,9 @@ if __name__ == '__main__':
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
 
+
     train_data = MAMLDataLoader(args.train_data_dir, args.batch_size, args.n_way, args.k_shot, args.q_query)
-    print("chegou linha 28---------------------------------------------------")
     #val_data = MAMLDataLoader(args.val_data_dir, args.val_batch_size)
-    
 
     inner_optimizer = optimizers.Adam(args.inner_lr)
     outer_optimizer = optimizers.Adam(args.outer_lr)
@@ -35,15 +34,16 @@ if __name__ == '__main__':
     maml = MAML(args.input_shape, args.n_way)
     # O número de verificações pode ser menor e não há necessidade de atualizar tantas vezes
     # #val_data.steps = 10
-
+    os.system('clear')
+    print("limpando")
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     dataset_treinamento = train_data.get_one_batch()
 
     for e in range(args.epochs):
-        train_progbar = utils.Progbar(train_data.steps)
-        print(f'Epochs {e+1}/{args.epochs}') #
+        train_progbar = utils.Progbar(1)
+        print(f'Epochs {e+1}/{args.epochs}')  #
 
-        train_meta_loss, train_meta_acc = [], []#
+        train_meta_loss, train_meta_acc = [], []  #
 
         batch_train_loss, acc = maml.train_on_batch(dataset_treinamento,
                                                     inner_optimizer,
