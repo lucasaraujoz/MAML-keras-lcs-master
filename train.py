@@ -32,11 +32,14 @@ if __name__ == '__main__':
     outer_optimizer = optimizers.Adam(args.outer_lr)
 
     maml = MAML(args.input_shape, args.n_way)
+    z = maml.get_maml_model()
+    print(type(z))
     # O número de verificações pode ser menor e não há necessidade de atualizar tantas vezes
     # #val_data.steps = 10
     os.system('clear')
     print("limpando")
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+
     dataset_treinamento = train_data.get_one_batch()
 
     for e in range(args.epochs):
@@ -68,7 +71,7 @@ if __name__ == '__main__':
     #     #val_meta_loss = []
     #     #val_meta_acc = []
     #
-    #     for i in range(4):  # len(self.file_list // batchsize
+    #     for i in range(train_data.steps):  # len(self.file_list // batchsize
     #         batch_train_loss, acc = maml.train_on_batch(train_data.get_one_batch(),  # carregado todas as tarefas
     #                                                     inner_optimizer,
     #                                                     inner_step=1,
