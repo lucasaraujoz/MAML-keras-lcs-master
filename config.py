@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-# @File : config.py
-# @Author: Runist
-# @Time : 2020/7/8 16:54
-# @Software: PyCharm
-# @Brief: 配置文件
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -31,9 +25,9 @@ parser.add_argument('--outer_lr', type=float, default=0.001,
 
 parser.add_argument('--n_way', type=int, default=2,
                     help='The number of class of every task.')
-parser.add_argument('--k_shot', type=int, default=5,
+parser.add_argument('--k_shot', type=int, default=7,
                     help='The number of support set image for every task.')
-parser.add_argument('--q_query', type=int, default=5,
+parser.add_argument('--q_query', type=int, default=7,
                     help='The number of query set image for every task.')
 parser.add_argument('--input_shape', type=tuple, default=(128, 128, 3),
                     help='The image shape of model input.')

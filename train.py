@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# @File : train.py
-# @Author: Runist
-# @Time : 2021/4/23 17:30
-# @Software: PyCharm
-# @Brief: 训练脚本
-
 from tensorflow.keras import optimizers, utils
 import tensorflow as tf
 import numpy as np

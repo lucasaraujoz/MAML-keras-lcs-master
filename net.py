@@ -1,13 +1,8 @@
-# -*- coding: utf-8 -*-
-# @File : net.py
-# @Author: Runist
-# @Time : 2020/7/6 16:52
-# @Software: PyCharm
-# @Brief: 实现模型分类的网络，MAML与网络结构无关，重点在训练过程
 import keras.layers
 from tensorflow.keras import layers, models, losses
 import tensorflow as tf
 from keras.applications.resnet import ResNet50
+from keras.applications.vgg16 import VGG16
 from keras.layers import Flatten, Dropout
 from keras import regularizers
 from keras.models import Model
@@ -27,22 +22,21 @@ class MAML:
 
     def get_maml_model(self):
         """
-        建立maml模型
         :return: maml model
         """
-        resnet50 = ResNet50(
+        backbone = VGG16(
             weights='imagenet',
             include_top=False,
             input_shape=(128, 128, 3)
         )
-        saida_cnn = resnet50.layers[-1].output
+        saida_cnn = backbone.layers[-1].output
         x = Flatten()(saida_cnn)
         x = keras.layers.Dense(256, kernel_regularizer=regularizers.l2(0.0001), activation='relu')(x)
-        x = Dropout(0.3)(x)
+        x = Dropout(0.4)(x)
         x = keras.layers.Dense(128, kernel_regularizer=regularizers.l2(0.0001), activation='relu')(x)
-        x = Dropout(0.3)(x)
-        predictions = layers.Dense(self.num_classes, activation='softmax')(x)
-        model = Model(inputs=resnet50.input, outputs=predictions)
+        x = Dropout(0.4)(x)
+        predictions = layers.Dense(self.num_classes, activation='sigmoid')(x)
+        model = Model(inputs=backbone.input, outputs=predictions)
         return model
         # model = models.Sequential([
         #     layers.Conv2D(filters=64, kernel_size=3, padding='same', activation="relu",

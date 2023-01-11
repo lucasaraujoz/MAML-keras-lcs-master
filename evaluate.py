@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# @File : evaluate.py
-# @Author: Runist
-# @Time : 2021/4/26 15:42
-# @Software: PyCharm
-# @Brief: 测试脚本
-
 from tensorflow.keras import optimizers, utils, metrics
 import tensorflow as tf
 import numpy as np
@@ -26,7 +19,6 @@ if __name__ == '__main__':
     mnist_model = MAML(args.input_shape, args.n_way)
     maml = MAML(args.input_shape, args.n_way)
 
-    # 对比测试
 
     # mnist weights
     mnist_model.meta_model.load_weights("mnist.h5")
