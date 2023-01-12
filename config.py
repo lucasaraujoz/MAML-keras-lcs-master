@@ -12,7 +12,7 @@ parser.add_argument('--summary_path', type=str,
                     default="./summary",
                     help='The directory of the summary writer.')
 
-parser.add_argument('--batch_size', type=int, default=10,
+parser.add_argument('--batch_size', type=int, default=20,
                     help='Number of task per train batch.')
 parser.add_argument('--val_batch_size', type=int, default=16,
                     help='Number of task per test batch.')

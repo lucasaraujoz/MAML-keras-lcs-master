@@ -29,7 +29,7 @@ if __name__ == '__main__':
     print(type(z))
     # O número de verificações pode ser menor e não há necessidade de atualizar tantas vezes
     # #val_data.steps = 10
-    os.system('clear')
+    #os.system('clear')
     print("limpando")
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 

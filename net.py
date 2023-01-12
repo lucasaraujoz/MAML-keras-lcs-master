@@ -3,6 +3,7 @@ from tensorflow.keras import layers, models, losses
 import tensorflow as tf
 from keras.applications.resnet import ResNet50
 from keras.applications.vgg16 import VGG16
+from keras.applications.densenet import DenseNet121
 from keras.layers import Flatten, Dropout
 from keras import regularizers
 from keras.models import Model
@@ -29,7 +30,8 @@ class MAML:
             include_top=False,
             input_shape=(128, 128, 3)
         )
-        saida_cnn = backbone.layers[-1].output
+        # saida_cnn = backbone.layers[-1].output
+        saida_cnn = backbone.output
         x = Flatten()(saida_cnn)
         x = keras.layers.Dense(256, kernel_regularizer=regularizers.l2(0.0001), activation='relu')(x)
         x = Dropout(0.4)(x)
