@@ -4,7 +4,7 @@ import tensorflow as tf
 from keras.applications.resnet import ResNet50
 from keras.applications.vgg16 import VGG16
 from keras.applications.densenet import DenseNet121
-from keras.layers import Flatten, Dropout
+from keras.layers import Flatten, Dropout, GlobalAvgPool2D, GlobalAveragePooling2D
 from keras import regularizers
 from keras.models import Model
 
@@ -31,7 +31,8 @@ class MAML:
             input_shape=(128, 128, 3)
         )
         # saida_cnn = backbone.layers[-1].output
-        saida_cnn = backbone.output
+        saida_cnn = backbone.output #vetor de matrizes
+        # x = GlobalAveragePooling2D(saida_cnn)
         x = Flatten()(saida_cnn)
         x = keras.layers.Dense(256, kernel_regularizer=regularizers.l2(0.0001), activation='relu')(x)
         x = Dropout(0.4)(x)
@@ -98,7 +99,6 @@ class MAML:
                     # if loss < min_loss
                     #     min_lso
                     #     best_model = meta_model.get_wetihg
-
                 grads = tape.gradient(loss, self.meta_model.trainable_variables)
                 inner_optimizer.apply_gradients(zip(grads, self.meta_model.trainable_variables))
 
@@ -111,7 +111,6 @@ class MAML:
         print("Optimizando tarefas individuais em cada conjunto query e salvando o loss na variavel batch_loss")
         with tf.GradientTape() as tape:
             for i, (query_image, query_label) in enumerate(zip(meta_query_image, meta_query_label)):
-                # 载入每个task weights进行前向传播
                 self.meta_model.set_weights(task_weights[i])  # carrega o peso da tarefa anterior treinada no suporte
 
                 logits = self.meta_model(query_image, training=True)

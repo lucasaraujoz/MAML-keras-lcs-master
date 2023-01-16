@@ -41,10 +41,10 @@ class MAMLDataLoader:
         # self.file_list = sao as pastas respectivas das classes
         # ex pneumonia
         # img_dirs = [Pneumonia, Covid, Hernia] se n_way = 3 monta um vetor de pastas aleatory de tamanho 3
-        img_dirs = random.sample(self.file_list, self.n_way) #n importa se o omnigot ter varios datasets terem classes dentro com nome character01, embora outro dataset tbm tenha caracter01
+        img_dirs = random.sample(self.file_list, self.n_way)
         print(f'img_dirs = {img_dirs}')
-        support_data = []
-        query_data = []
+        support_data = [] #aux
+        query_data = [] #aux
 
         support_image = []
         support_label = []
@@ -53,7 +53,7 @@ class MAMLDataLoader:
         #n importa pq aqui na amostra cada classe vai receber seu respectivo label do enumerate
         for label, img_dir in enumerate(img_dirs):  # ex: [[0, Pneumonia], [1, Covid], [2, Hernia]]
             img_list = [f for f in
-                        glob.glob(img_dir + "**/*.png", recursive=True)]  # img_list = [todas as imagens pra uma pasta]
+                        glob.glob(img_dir + "/*.png", recursive=True)]  # img_list = [todas as imagens pra uma pasta]
             images = random.sample(img_list, self.k_shot + self.q_query)  # se kshot=query=2 images [img1,img2,img3,img4]
 
             # Read support set
@@ -62,7 +62,7 @@ class MAMLDataLoader:
                 image = cv.resize(image, (128, 128))
                 image = (image / 255.).astype("float32")
                 #image = np.expand_dims(image, axis=-1)
-                support_data.append((image, label))
+                support_data.append((image, label)) #adiciona uma tupla no vetor suporte_data
 
             # Read query set
             for img_path in images[self.k_shot:]: #suport_image = [img3,img4]
@@ -70,7 +70,7 @@ class MAMLDataLoader:
                 image = cv.resize(image, (128, 128))
                 image = (image / 255.).astype("float32")
                 #image = np.expand_dims(image, axis=-1)
-                query_data.append((image, label))
+                query_data.append((image, label))  #adiciona uma tupla no vetor query_data
 
         # shuffle support set
         random.shuffle(support_data)
@@ -100,8 +100,8 @@ class MAMLDataLoader:
             batch_query_image = []
             batch_query_label = []
 
-            for _ in range(self.meta_batch_size): # meta_batch size = numero de tarefas
-                support_image, support_label, query_image, query_label = self.get_one_task_data() # preparado um conjunto suporte/query aleatorio do dataset fornecido
+            for _ in range(self.meta_batch_size):  # meta_batch size = numero de tarefas
+                support_image, support_label, query_image, query_label = self.get_one_task_data()  # preparado um conjunto suporte/query aleatorio do dataset fornecido
                 batch_support_image.append(support_image)
                 batch_support_label.append(support_label)
                 batch_query_image.append(query_image)
