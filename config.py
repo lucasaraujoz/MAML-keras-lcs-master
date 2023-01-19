@@ -29,7 +29,7 @@ parser.add_argument('--k_shot', type=int, default=7,
                     help='The number of support set image for every task.')
 parser.add_argument('--q_query', type=int, default=7,
                     help='The number of query set image for every task.')
-parser.add_argument('--input_shape', type=tuple, default=(128, 128, 3),
+parser.add_argument('--input_shape', type=tuple, default=(256, 256, 3),
                     help='The image shape of model input.')
 
 args = parser.parse_args()

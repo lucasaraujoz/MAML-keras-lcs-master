@@ -4,9 +4,10 @@ import tensorflow as tf
 from keras.applications.resnet import ResNet50
 from keras.applications.vgg16 import VGG16
 from keras.applications.densenet import DenseNet121
-from keras.layers import Flatten, Dropout, GlobalAvgPool2D, GlobalAveragePooling2D
+from keras.layers import Flatten, Dropout, GlobalAvgPool2D, Conv2D, GlobalAveragePooling2D
 from keras import regularizers
 from keras.models import Model
+from colorama import Fore, Back, Style
 
 
 class MAML:
@@ -25,14 +26,14 @@ class MAML:
         """
         :return: maml model
         """
-        backbone = VGG16(
+        backbone = DenseNet121(
             weights='imagenet',
             include_top=False,
-            input_shape=(128, 128, 3)
+            input_shape=(256, 256, 3)
         )
         # saida_cnn = backbone.layers[-1].output
-        saida_cnn = backbone.output #vetor de matrizes
-        # x = GlobalAveragePooling2D(saida_cnn)
+        saida_cnn = backbone.output  # vetor de matrizes
+        x = Conv2D(filters=1, kernel_size=1, padding='same', activation='relu')(saida_cnn)
         x = Flatten()(saida_cnn)
         x = keras.layers.Dense(256, kernel_regularizer=regularizers.l2(0.0001), activation='relu')(x)
         x = Dropout(0.4)(x)
@@ -40,6 +41,7 @@ class MAML:
         x = Dropout(0.4)(x)
         predictions = layers.Dense(self.num_classes, activation='sigmoid')(x)
         model = Model(inputs=backbone.input, outputs=predictions)
+        model.summary()
         return model
         # model = models.Sequential([
         #     layers.Conv2D(filters=64, kernel_size=3, padding='same', activation="relu",
@@ -82,7 +84,7 @@ class MAML:
         meta_weights = self.meta_model.get_weights()
 
         meta_support_image, meta_support_label, meta_query_image, meta_query_label = next(train_data)  # ????
-        print("Optimizando tarefas individuais em cada conjunto suporte")
+        print(Fore.RED + "Optimizando tarefas individuais em cada conjunto suporte" + Style.RESET_ALL)
         for support_image, support_label in zip(meta_support_image, meta_support_label):
             # min_loss = math.inf
             # best_model = None
@@ -108,7 +110,8 @@ class MAML:
 
         # *usa o modelo otimizado de cada tarefa* para fazer uma predição.
         # o loss médio dentre as queries de cada tarefa será utilizado para atualizar os pesos do modelo
-        print("Optimizando tarefas individuais em cada conjunto query e salvando o loss na variavel batch_loss")
+        print(
+            Fore.GREEN + "Optimizando tarefas individuais em cada conjunto query e salvando o loss na variavel batch_loss" + Style.RESET_ALL)
         with tf.GradientTape() as tape:
             for i, (query_image, query_label) in enumerate(zip(meta_query_image, meta_query_label)):
                 self.meta_model.set_weights(task_weights[i])  # carrega o peso da tarefa anterior treinada no suporte
@@ -131,7 +134,8 @@ class MAML:
 
         # Independente de ser atualizado ou não, é necessário carregar o peso inicial para atualização para evitar
         # que a etapa val altere o peso original
-        print("recuperando peso original do meta-modelo e atualizando o meta-modelo com o batch_loss")
+        print(
+            Fore.BLUE + "Recuperando peso original do meta-modelo e atualizando o meta-modelo com o batch_loss" + Style.RESET_ALL)
         self.meta_model.set_weights(
             meta_weights)  # retorna ao peso inicial da rede, ja que cada tarefa qnd treinada alterava o self.meta_model e guardava os pesos das redes de cada tarefa em tasks_weights[i]
         if outer_optimizer:
