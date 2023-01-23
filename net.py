@@ -29,7 +29,7 @@ class MAML:
         backbone = DenseNet121(
             weights='imagenet',
             include_top=False,
-            input_shape=(256, 256, 3)
+            input_shape=(128, 128, 3)
         )
         # saida_cnn = backbone.layers[-1].output
         saida_cnn = backbone.output  # vetor de matrizes
@@ -41,7 +41,7 @@ class MAML:
         x = Dropout(0.4)(x)
         predictions = layers.Dense(self.num_classes, activation='sigmoid')(x)
         model = Model(inputs=backbone.input, outputs=predictions)
-        model.summary()
+        #model.summary()
         return model
         # model = models.Sequential([
         #     layers.Conv2D(filters=64, kernel_size=3, padding='same', activation="relu",
@@ -134,11 +134,11 @@ class MAML:
 
         # Independente de ser atualizado ou não, é necessário carregar o peso inicial para atualização para evitar
         # que a etapa val altere o peso original
-        print(
-            Fore.BLUE + "Recuperando peso original do meta-modelo e atualizando o meta-modelo com o batch_loss" + Style.RESET_ALL)
         self.meta_model.set_weights(
             meta_weights)  # retorna ao peso inicial da rede, ja que cada tarefa qnd treinada alterava o self.meta_model e guardava os pesos das redes de cada tarefa em tasks_weights[i]
         if outer_optimizer:
+            print(
+            Fore.BLUE + "Recuperando peso original do meta-modelo e atualizando o meta-modelo com o batch_loss" + Style.RESET_ALL)
             grads = tape.gradient(mean_loss, self.meta_model.trainable_variables)
             outer_optimizer.apply_gradients(zip(grads, self.meta_model.trainable_variables))
 

@@ -17,9 +17,9 @@ if __name__ == '__main__':
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
 
-
-    train_data = MAMLDataLoader(args.train_data_dir, args.batch_size, args.n_way, args.k_shot, args.q_query)
-    #val_data = MAMLDataLoader(args.val_data_dir, args.val_batch_size)
+    train_data = MAMLDataLoader(
+        args.train_data_dir, args.batch_size, args.n_way, args.k_shot, args.q_query)
+    val_data = MAMLDataLoader(args.val_data_dir, 2, args.val_batch_size, args.k_shot, args.q_query) # ou 1,1 
 
     inner_optimizer = optimizers.Adam(args.inner_lr)
     outer_optimizer = optimizers.Adam(args.outer_lr)
@@ -28,8 +28,8 @@ if __name__ == '__main__':
     z = maml.get_maml_model()
     print(type(z))
     # O número de verificações pode ser menor e não há necessidade de atualizar tantas vezes
-    # #val_data.steps = 10
-    #os.system('clear')
+    val_data.steps = 10
+    # os.system('clear')
     print("limpando")
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 
@@ -41,15 +41,32 @@ if __name__ == '__main__':
 
         train_meta_loss, train_meta_acc = [], []  #
 
-        batch_train_loss, acc = maml.train_on_batch(dataset_treinamento,
-                                                    inner_optimizer,
-                                                    inner_step=1,
-                                                    outer_optimizer=outer_optimizer
-                                                    )
-        train_meta_loss.append(batch_train_loss)
-        train_meta_acc.append(acc)
-        train_progbar.update(1, [('loss', np.mean(train_meta_loss)), ('accuracy', np.mean(train_meta_acc))])
+        # batch_train_loss, acc = maml.train_on_batch(dataset_treinamento,
+        #                                             inner_optimizer,
+        #                                             inner_step=1,
+        #                                             outer_optimizer=outer_optimizer
+        #                                             )
+        # train_meta_loss.append(batch_train_loss)
+        # train_meta_acc.append(acc)
+        # train_progbar.update(
+        #     1, [('loss', np.mean(train_meta_loss)), ('accuracy', np.mean(train_meta_acc))])
 
+        val_meta_loss = []
+        val_meta_acc = []
+        val_progbar = utils.Progbar(val_data.steps)
+
+        for i in range(val_data.steps):
+            print("============================================================================")
+            print('valida')
+            batch_val_loss, val_acc = maml.train_on_batch(
+                val_data.get_one_batch(), inner_optimizer, inner_step=3)
+
+            val_meta_loss.append(batch_val_loss)
+            val_meta_acc.append(val_acc)
+            val_progbar.update(i+1, [('val_loss', np.mean(val_meta_loss)),
+                                     ('val_accuracy', np.mean(val_meta_acc))])
+
+            maml.meta_model.save_weights("maml.h5")
 
     ###########################
     # for e in range(args.epochs):
@@ -78,12 +95,3 @@ if __name__ == '__main__':
     #     print("fim treino")
     #     #acredito que o evaluate e pra testar a perfomance do maml em outros conjuntos
     #
-    #     # for i in range(val_data.steps):
-    #     #     batch_val_loss, val_acc = maml.train_on_batch(val_data.get_one_batch(), inner_optimizer, inner_step=3)
-    #     #
-    #     #     val_meta_loss.append(batch_val_loss)
-    #     #     val_meta_acc.append(val_acc)
-    #     #     val_progbar.update(i+1, [('val_loss', np.mean(val_meta_loss)),
-    #     #                              ('val_accuracy', np.mean(val_meta_acc))])
-    #
-    #     maml.meta_model.save_weights("maml.h5")
